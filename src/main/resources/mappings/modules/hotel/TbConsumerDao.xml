@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.hotel.dao.TbConsumerDao">
+
+	<sql id="tbConsumerColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.phone AS "phone",
+		a.card AS
+		"card",
+		a.email AS "email",
+		a.intime AS "intime",
+		a.outtime AS "outtime",
+		a.room_id AS "room.id",
+		a.remark AS "remark",
+		b.number AS "room.number"
+	</sql>
+
+	<sql id="tbConsumerJoins">
+		left join tb_room b on a.room_id=b.id
+	</sql>
+
+	<select id="get" resultType="TbConsumer">
+		SELECT
+		<include refid="tbConsumerColumns" />
+		FROM tb_consumer a
+		<include refid="tbConsumerJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="TbConsumer">
+		SELECT
+		<include refid="tbConsumerColumns" />
+		FROM tb_consumer a
+		<include refid="tbConsumerJoins" />
+		<where>
+
+			<if test="name != null and name != ''">
+				AND a.name = #{name}
+			</if>
+			<if test="card != null and card != ''">
+				AND a.card = #{card}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="TbConsumer">
+		SELECT
+		<include refid="tbConsumerColumns" />
+		FROM tb_consumer a
+		<include refid="tbConsumerJoins" />
+		<where>
+
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO tb_consumer(
+		id,
+		name,
+		phone,
+		card,
+		email,
+		intime,
+		outtime,
+		room_id,
+		remark
+		) VALUES (
+		#{id},
+		#{name},
+		#{phone},
+		#{card},
+		#{email},
+		#{intime},
+		#{outtime},
+		#{room.id},
+		#{remark}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE tb_consumer SET
+		name = #{name},
+		phone = #{phone},
+		card = #{card},
+		email = #{email},
+		intime = #{intime},
+		outtime = #{outtime},
+		room_id = #{room.id},
+		remark = #{remark}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		DELETE FROM tb_consumer
+		WHERE id = #{id}
+	</update>
+
+</mapper>

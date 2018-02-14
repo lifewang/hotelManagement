@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.hotel.dao.TbCustomerDao">
+
+	<sql id="tbCustomerColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.sex AS "sex",
+		a.datebirth AS
+		"datebirth",
+		a.phone AS "phone",
+		a.card AS "card",
+		a.remark AS "remark",
+		a.cardtype AS "cardtype",
+		a.country AS "country",
+		a.email AS "email",
+		a.company AS "company",
+		a.address AS "address",
+		a.intime AS "intime",
+		a.outtime AS "outtime",
+		a38.code AS "area.code",
+		a.user_id AS "user.id",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag
+		AS "delFlag",
+		a.state AS "state",
+		a.love AS "love",
+		a.room_id AS
+		"room.id",
+		b.number AS "room.number",
+		u16.name AS "user.name"
+	</sql>
+
+	<sql id="tbCustomerJoins">
+		LEFT JOIN sys_user u16 ON u16.id = a.user_id
+		LEFT JOIN
+		tb_room b on a.room_id=b.id
+		LEFT JOIN sys_area a38 ON a38.code =
+		a.region_code
+		LEFT JOIN sys_office o ON o.id = u16.office_id
+	</sql>
+
+	<select id="get" resultType="TbCustomer">
+		SELECT
+		<include refid="tbCustomerColumns" />
+		FROM tb_customer a
+		<include refid="tbCustomerJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<!-- 预定操作sql语句 -->
+	<select id="getById" resultType="TbCustomer">
+		SELECT
+		<include refid="tbCustomerColumns" />
+		FROM tb_customer a
+		<include refid="tbCustomerJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="TbCustomer">
+		SELECT
+		<include refid="tbCustomerColumns" />
+		FROM tb_customer a
+		<include refid="tbCustomerJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name = #{name}
+			</if>
+			<if test="card != null and card != ''">
+				AND a.card = #{card}
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${sqlMap.dsf}
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="TbCustomer">
+		SELECT
+		<include refid="tbCustomerColumns" />
+		FROM tb_customer a
+		<include refid="tbCustomerJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO tb_customer(
+		id,
+		name,
+		sex,
+		datebirth,
+		phone,
+		card,
+		remark,
+		cardtype,
+		country,
+		email,
+		company,
+		address,
+		intime,
+		outtime,
+		region_code,
+		user_id,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		del_flag,
+		love,
+		room_id,
+		state
+		) VALUES (
+		#{id},
+		#{name},
+		#{sex},
+		#{datebirth},
+		#{phone},
+		#{card},
+		#{remark},
+		#{cardtype},
+		#{country},
+		#{email},
+		#{company},
+		#{address},
+		#{intime},
+		#{outtime},
+		#{area.code},
+		#{user.id},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{delFlag},
+		#{love},
+		#{room.id},
+		#{state}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE tb_customer SET
+		name = #{name},
+		sex = #{sex},
+		datebirth = #{datebirth},
+		phone = #{phone},
+		card = #{card},
+		remark = #{remark},
+		cardtype = #{cardtype},
+		country = #{country},
+		email = #{email},
+		company = #{company},
+		address = #{address},
+		intime = #{intime},
+		outtime = #{outtime},
+		region_code = #{area.code},
+		user_id = #{user.id},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		room_id = #{room.id},
+		state = #{state},
+		love = #{love}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE tb_customer SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

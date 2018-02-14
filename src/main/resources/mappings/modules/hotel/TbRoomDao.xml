@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.hotel.dao.TbRoomDao">
+
+	<sql id="tbRoomColumns">
+		a.id AS "id",
+		a.category AS "category",
+		a.status AS "status",
+		a.remark AS "remark",
+		a.number AS "number",
+		a.price AS "price",
+		a.state
+		AS "state",
+		a.facilitie AS "facilitie",
+		a.reserve AS "customer.id",
+		b.state AS "customer.state"
+	</sql>
+
+	<sql id="tbRoomJoins">
+		left join tb_customer b on b.room_id=a.id
+	</sql>
+
+	<select id="get" resultType="TbRoom">
+		SELECT
+		<include refid="tbRoomColumns" />
+		FROM tb_room a
+		<include refid="tbRoomJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<!-- 结账操作sql语句 -->
+	<select id="getById" resultType="TbRoom">
+		SELECT
+		<include refid="tbRoomColumns" />
+		FROM tb_room a
+		<include refid="tbRoomJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<!-- 获取未预定房间 -->
+	<select id="getRoom" statementType="CALLABLE" resultType="Map">
+		{call get_room_by_status()}
+	</select>
+
+	<!-- 根据房间号查询房间信息sql语句 -->
+	<select id="findlists" resultType="TbRoom">
+		SELECT * from tb_room
+		where number=#{number}
+	</select>
+
+	<select id="findList" resultType="TbRoom">
+		SELECT
+		<include refid="tbRoomColumns" />
+		FROM tb_room a
+		<include refid="tbRoomJoins" />
+		<where>
+
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="number != null and number != ''">
+				AND a.number = #{number}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="TbRoom">
+		SELECT
+		<include refid="tbRoomColumns" />
+		FROM tb_room a
+		<include refid="tbRoomJoins" />
+		<where>
+
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO tb_room(
+		id,
+		category,
+		status,
+		remark,
+		number,
+		price,
+		state,
+		facilitie,
+		reserve
+		) VALUES (
+		#{id},
+		#{category},
+		#{status},
+		#{remark},
+		#{number},
+		#{price},
+		#{state},
+		#{facilitie},
+		#{customer.id}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE tb_room SET
+		category = #{category},
+		status = #{status},
+		remark = #{remark},
+		number = #{number},
+		price = #{price},
+		state = #{state},
+		facilitie = #{facilitie},
+		reserve = #{customer.id}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		DELETE FROM tb_room
+		WHERE id = #{id}
+	</update>
+
+</mapper>

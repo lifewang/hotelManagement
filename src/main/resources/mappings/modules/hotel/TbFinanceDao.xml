@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.hotel.dao.TbFinanceDao">
+
+	<sql id="tbFinanceColumns">
+		a.id AS "id",
+		a.income AS "income",
+		a.updates AS "updates",
+		a.remark AS "remark"
+	</sql>
+
+	<sql id="tbFinanceJoins">
+	</sql>
+
+	<select id="get" resultType="TbFinance">
+		SELECT
+		<include refid="tbFinanceColumns" />
+		FROM tb_finance a
+		<include refid="tbFinanceJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<!-- 月收入统计 -->
+	<select id="getIncomeInfo" resultType="Map" statementType="CALLABLE">
+		{call get_income_by_month()}
+	</select>
+
+	<!-- 年收入统计 -->
+	<select id="getIncomeInfodate" resultType="Map" statementType="CALLABLE">
+		{call get_income_by_year()}
+	</select>
+
+	<select id="findList" resultType="TbFinance">
+		SELECT
+		<include refid="tbFinanceColumns" />
+		FROM tb_finance a
+		<include refid="tbFinanceJoins" />
+		<where>
+			<if test="income != null and income != ''">
+				AND a.income = #{income}
+			</if>
+
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="TbFinance">
+		SELECT
+		<include refid="tbFinanceColumns" />
+		FROM tb_finance a
+		<include refid="tbFinanceJoins" />
+		<where>
+
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO tb_finance(
+		id,
+		income,
+		updates,
+		remark
+		)
+		VALUES (
+		#{id},
+		#{income},
+		#{updates},
+		#{remark}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE tb_finance SET
+		income = #{income},
+		updates =
+		#{updates},
+		remark = #{remark}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		DELETE FROM tb_finance
+		WHERE id = #{id}
+	</update>
+
+</mapper>
